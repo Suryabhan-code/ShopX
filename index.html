@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopX - Online Shopping</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial;background:#f5f5f5;color:#222}
+header{background:#fff;padding:18px 5%;display:flex;
+justify-content:space-between;align-items:center;gap:15px;
+flex-wrap:wrap;box-shadow:0 2px 8px #ddd}
+.logo{font-size:30px;font-weight:bold;color:#9c27b0}
+.search{padding:12px;width:300px;max-width:100%;
+border:1px solid #ccc;border-radius:6px}
+button{cursor:pointer;border:0;padding:10px 15px;
+border-radius:5px;background:#9c27b0;color:white}
+.hero{background:#ead5f5;padding:45px 7%;text-align:center}
+.hero h1{font-size:38px;color:#70218a;margin-bottom:12px}
+.categories{text-align:center;padding:25px}
+.categories button{margin:6px}
+.products{padding:20px 5%;display:grid;
+grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:20px}
+.card{background:white;padding:12px;border-radius:10px;
+box-shadow:0 2px 8px #ddd}
+.card img{width:100%;height:190px;object-fit:cover;
+border-radius:7px}
+.card h3{margin:12px 0}
+.price{font-size:19px;font-weight:bold;color:#8e24aa;
+margin:10px 0}
+.card button{width:100%}
+#cart{background:white;padding:25px;margin:25px 5%;
+border-radius:10px}
+.cartitem{padding:12px;border-bottom:1px solid #ddd;
+display:flex;justify-content:space-between;gap:10px}
+footer{text-align:center;background:#222;color:white;
+padding:25px;margin-top:30px}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">ShopX</div>
+<input class="search" id="search" placeholder="Search products..."
+oninput="render()">
+<button onclick="document.getElementById('cart').scrollIntoView()">
+🛒 Cart (<span id="count">0</span>)
+</button>
+</header>
+
+<div class="hero">
+<h1>Big Shopping Days!</h1>
+<p>Discover amazing products at amazing prices.</p>
+<br>
+<button onclick="document.getElementById('products').scrollIntoView()">
+Shop Now
+</button>
+</div>
+
+<div class="categories">
+<h2>Shop by Category</h2><br>
+<button onclick="setCategory('All')">All</button>
+<button onclick="setCategory('Fashion')">Fashion</button>
+<button onclick="setCategory('Electronics')">Electronics</button>
+<button onclick="setCategory('Home')">Home</button>
+<button onclick="setCategory('Beauty')">Beauty</button>
+</div>
+
+<h2 style="padding:10px 5%">Trending Products</h2>
+<div class="products" id="products"></div>
+
+<div id="cart">
+<h2>🛒 My Shopping Cart</h2>
+<div id="cartitems">Your cart is empty.</div>
+<h3 id="total">Total: ₹0</h3>
+</div>
+
+<footer>
+<h2>ShopX</h2>
+<p>Your online shopping destination.</p>
+<p>© 2026 ShopX. All rights reserved.</p>
+</footer>
+
+<script>
+const products=[
+{id:1,name:"Stylish T-Shirt",price:299,cat:"Fashion",
+img:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400"},
+{id:2,name:"Smart Watch",price:799,cat:"Electronics",
+img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400"},
+{id:3,name:"Sneakers",price:999,cat:"Fashion",
+img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400"},
+{id:4,name:"Headphones",price:599,cat:"Electronics",
+img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400"},
+{id:5,name:"Home Decor",price:399,cat:"Home",
+img:"https://images.unsplash.com/photo-1490312278390-ab64016e0aa9?w=400"},
+{id:6,name:"Beauty Product",price:249,cat:"Beauty",
+img:"https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400"}
+];
+
+let cart=[];
+let category="All";
+
+function setCategory(c){
+category=c;
+render();
+}
+
+function render(){
+let q=document.getElementById("search").value.toLowerCase();
+let list=products.filter(p=>
+(category==="All"||p.cat===category)&&
+p.name.toLowerCase().includes(q)
+);
+document.getElementById("products").innerHTML=list.map(p=>`
+<div class="card">
+<img src="${p.img}" alt="${p.name}">
+<h3>${p.name}</h3>
+<p>${p.cat}</p>
+<div class="price">₹${p.price}</div>
+<button onclick="add(${p.id})">Add to Cart</button>
+</div>`).join("");
+}
+
+function add(id){
+let item=cart.find(p=>p.id===id);
+if(item)item.qty++;
+else cart.push({...products.find(p=>p.id===id),qty:1});
+updateCart();
+}
+
+function removeItem(id){
+cart=cart.filter(p=>p.id!==id);
+updateCart();
+}
+
+function updateCart(){
+let count=cart.reduce((s,p)=>s+p.qty,0);
+let total=cart.reduce((s,p)=>s+p.price*p.qty,0);
+document.getElementById("count").innerText=count;
+document.getElementById("total").innerText="Total: ₹"+total;
+document.getElementById("cartitems").innerHTML=
+cart.length?cart.map(p=>`
+<div class="cartitem">
+<span>${p.name} × ${p.qty} = ₹${p.price*p.qty}</span>
+<button onclick="removeItem(${p.id})">Remove</button>
+</div>`).join(""):"Your cart is empty.";
+}
+
+render();
+</script>
+</body>
+</html>
